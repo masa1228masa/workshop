@@ -57,10 +57,10 @@ void loop(){
       fps.SetLED(true);
       Detect();
       Serial.println(str + " end!!");
-    }else if(str == "turn right"){
+    }else if(str == "open"){
       Turn(true);  
       Serial.println(str + " end!!");    
-    }else if(str == "turn left"){
+    }else if(str == "close"){
       Turn(false);
       Serial.println(str + " end!!");     
     }else{
