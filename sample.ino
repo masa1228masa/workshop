@@ -1,6 +1,10 @@
 #include "FPS_GT511C3.h"
 #include "SoftwareSerial.h"
 #include<Servo.h>
+#include <Wire.h> //added
+#include <LiquidCrystal_I2C.h>  //added
+
+LiquidCrystal_I2C lcd(0x3F,16,2); //added
 
 String readinput();
 void Enroll();
@@ -9,8 +13,7 @@ void Turn(bool);//true:open,false:close
 
 Servo servo;
 FPS_GT511C3 fps(4,5);
-int ID = 0;//the granted finger ID to operate servo 
-
+int ID = 0;//the granted finger ID to operate servo
 
 void setup(){
   Serial.begin(9600);
@@ -20,6 +23,7 @@ void setup(){
   fps.SetLED(true);
   delay(1000);
   fps.SetLED(false);
+  lcd.init(); 
 }
 
 bool turn = false;
@@ -28,10 +32,10 @@ void loop(){
   String str;
 
   str = readinput();
-  
+
   if(str.length() > 0){
     if(str == "enroll"){
-      fps.SetLED(true);  
+      fps.SetLED(true);
       delay(1000);
       fps.SetLED(false);
       delay(1000);
@@ -58,13 +62,19 @@ void loop(){
       Detect();
       Serial.println(str + " end!!");
     }else if(str == "open"){
-      Turn(true);  
-      Serial.println(str + " end!!");    
+      Turn(true);
+      Serial.println(str + " end!!");
+      lcd.setCursor(0,0);  //added
+      lcd.backlight(); //added
+      lcd.print("OPEN!!"); //added
     }else if(str == "close"){
       Turn(false);
-      Serial.println(str + " end!!");     
+      Serial.println(str + " end!!");
+      lcd.setCursor(0,0);  //added
+      lcd.backlight(); //added
+      lcd.print("CLOSE!!"); //added
     }else{
-      Serial.println("wrong command!!");  
+      Serial.println("wrong command!!");
     }
   }
 }
@@ -73,7 +83,7 @@ void loop(){
 String readinput(){
   String str;
   if(Serial.available()>0){
-    delay(100);  
+    delay(100);
     while(Serial.available()>0){
       int input = Serial.read();
       str.concat((char)input);
@@ -105,7 +115,7 @@ void Enroll()
 	if (bret != false)
 	{
 		Serial.println("Remove finger");
-		fps.Enroll1(); 
+		fps.Enroll1();
 		while(fps.IsPressFinger() == true) delay(100);
 		Serial.println("Press same finger again");
 		while(fps.IsPressFinger() == false) delay(100);
